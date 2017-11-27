@@ -23,18 +23,16 @@ namespace :version do
     Rails.root.join(DEPLOYMENT_NAME)
   end
 
+  def create_file_with_content(file, content)
+    File.open(file, "w+") do |f|
+      f.write(content)
+    end
+  end
+
   desc 'Initialize Versioning - Create Changelog and Deployment Files'
   task init: :environment do
-    unless File.exist?(deployment_file_path)
-      File.open(deployment_file_path, "w+") do |f|
-        f.write("")
-      end
-    end
-    unless File.exist?(changelog_file_path)
-      File.open(changelog_file_path, "w+") do |f|
-        f.write("# Changelog #{application_name}")
-      end
-    end
+    create_file_with_content(deployment_file_path, "") unless File.exist?(deployment_file_path)
+    create_file_with_content(changelog_file_path, "# Changelog #{application_name}") unless File.exist?(changelog_file_path)
   end
 
   desc 'Bump version'
@@ -54,31 +52,40 @@ namespace :version do
     print 'Confirm? (Y/n): '
     confirmation = (STDIN.gets.chomp == 'Y')
 
-    if confirmation
-      STDERR.puts 'Updating version.rb...'
-      file = Rails.root.join('config', 'initializers', 'version.rb')
-      content = File.read(file)
-      File.open(file, 'w') do |f|
-        f.puts content.gsub(/VERSION = '#{old_version}'/, "VERSION = '#{new_version}'")
-      end
+    unless confirmation
+      STDERR.puts 'Abort, nothing done.'
+      exit 1
+    end
 
-      title = "## #{application_name} v#{new_version} (#{Date.today.strftime('%d.%m.%Y')})"
+    puts 'Updating version.rb...'
+    file = Rails.root.join('config', 'initializers', 'version.rb')
+    content = File.read(file)
+    File.open(file, 'w') do |f|
+      f.puts content.gsub(/VERSION = '#{old_version}'/, "VERSION = '#{new_version}'")
+    end
 
-      STDERR.puts "Updating #{DEPLOYMENT_NAME}..."
+    title = "## #{application_name} v#{new_version} (#{Date.today.strftime('%d.%m.%Y')})"
+
+    if File.exist?(deployment_file_path)
+      puts "Updating #{DEPLOYMENT_NAME}..."
       content = File.read(deployment_file_path)
       File.open(deployment_file_path, 'w') do |f|
         f.puts title
         f.puts
         f.puts content
       end
+    else
+      STDERR.puts "file #{DEPLOYMENT_NAME} is missing! did you run 'version:init'?"
+    end
 
-      STDERR.puts "Updating #{CHANGELOG_NAME}..."
+    if File.exist?(changelog_file_path)
+      puts "Updating #{CHANGELOG_NAME}..."
       content = File.read(changelog_file_path)
       File.open(changelog_file_path, 'w') do |f|
         f.puts content.gsub(/^(# Changelog #{application_name})$/, "\\1\n\n#{title}")
       end
     else
-      STDERR.puts 'Abort, nothing done.'
+      STDERR.puts "file #{CHANGELOG_NAME} is missing! did you run 'version:init'?"
     end
   end
 
