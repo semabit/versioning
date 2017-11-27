@@ -1,5 +1,8 @@
 namespace :version do
 
+  CHANGELOG_NAME = 'CHANGELOG.md'
+  DEPLOYMENT_NAME = 'DEPLOYMENT.md'
+
   def ensure_version_defined
     unless defined? Rails.application.class::VERSION
       STDERR.puts 'You need to add the file "config/initializers/version.rb" which defines the version as a constant in the application namespace.'
@@ -13,11 +16,11 @@ namespace :version do
   end
 
   def changelog_file_path
-    Rails.root.join('CHANGELOG.md')
+    Rails.root.join(CHANGELOG_NAME)
   end
 
   def deployment_file_path
-    Rails.root.join('DEPLOYMENT.md')
+    Rails.root.join(DEPLOYMENT_NAME)
   end
 
   desc 'Initialize Versioning - Create Changelog and Deployment Files'
@@ -61,7 +64,7 @@ namespace :version do
 
       title = "## #{application_name} v#{new_version} (#{Date.today.strftime('%d.%m.%Y')})"
 
-      STDERR.puts 'Updating DEPLOYMENT.md...'
+      STDERR.puts "Updating #{DEPLOYMENT_NAME}..."
       content = File.read(deployment_file_path)
       File.open(deployment_file_path, 'w') do |f|
         f.puts title
@@ -69,7 +72,7 @@ namespace :version do
         f.puts content
       end
 
-      STDERR.puts 'Updating CHANGELOG.md...'
+      STDERR.puts "Updating #{CHANGELOG_NAME}..."
       content = File.read(changelog_file_path)
       File.open(changelog_file_path, 'w') do |f|
         f.puts content.gsub(/^(# Changelog #{application_name})$/, "\\1\n\n#{title}")
