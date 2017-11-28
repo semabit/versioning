@@ -12,6 +12,7 @@ namespace :version do
   end
 
   def application_name
+    return Rails.application.class::NAME if defined? Rails.application.class::NAME
     Rails.application.class.parent_name.underscore.humanize.split.map(&:capitalize).join(' ')
   end
 

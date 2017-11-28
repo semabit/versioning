@@ -29,9 +29,13 @@ First you need to create the version file under `config/initializers/version.rb`
 module YourApplication
   module Application
     VERSION='x.x.x'
+    NAME='Your custom Application name' # this line is optional (see below)
   end
 end
 ```
+`NAME` constant is used in CHANGELOG and DEPLOYMENT files (in titles).
+If the `NAME` constant is not specified, the parent module name of the application is formed into a humanized name. Per example:  
+`YourApplication` is turned into: `Your Application`
 
 Now execute `version:init` with:  
 ```
