@@ -28,8 +28,8 @@ First you need to create the version file under `config/initializers/version.rb`
 ```ruby
 module YourApplication
   module Application
-    VERSION='x.x.x'
-    NAME='Your custom Application name' # this line is optional (see below)
+    VERSION = 'x.x.x'
+    NAME = 'Your custom Application name' # this line is optional (see below)
   end
 end
 ```
