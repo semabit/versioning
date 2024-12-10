@@ -48,7 +48,7 @@ namespace :version do
     puts "Updating #{version_file_path}..."
     content = File.read(version_file_path)
     File.open(version_file_path, 'w') do |f|
-      f.puts content.gsub(/VERSION = '#{old_version}'/, "VERSION = '#{new_version}'")
+      f.puts content.gsub(/VERSION ?= ?'#{old_version}'/, "VERSION = '#{new_version}'")
     end
 
     title = "## #{application_name} v#{new_version} (#{Date.today.strftime('%d.%m.%Y')})"
